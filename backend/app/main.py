@@ -6,6 +6,7 @@ Main FastAPI application
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
+from app.api import routes
 
 settings = get_settings()
 
@@ -21,15 +22,13 @@ app = FastAPI(
 # CORS for frontend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production: specify your domain
+    allow_origins=["*"],  # In production: specify domain here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routes will be added here as we build them
-# from app.api import routes
-# app.include_router(routes.router, prefix="/api/v1", tags=["tuning"])
+app.include_router(routes.router, prefix="/api/v1", tags=["TuningAI"])
 
 
 @app.get("/")
@@ -41,8 +40,13 @@ async def root():
         "version": "0.1.0",
         "status": "operational",
         "docs": "/docs",
+        "api": "/api/v1",
         "phase": "Week 1: Core Resume Tuning",
         "features": {
+            "analyze": "✅ Match resume to job",
+            "improve": "✅ Generate improvements",
+            "ats_check": "✅ ATS compatibility",
+            "interview_prep": "✅ Predict questions",
             "rag": settings.ENABLE_RAG,
             "agents": settings.ENABLE_AGENTS
         }
@@ -55,7 +59,9 @@ async def health_check():
     return {
         "status": "healthy",
         "app": "TuningAI",
-        "version": "0.1.0"
+        "version": "0.1.0",
+        "rag_enabled": settings.ENABLE_RAG,
+        "agents_enabled": settings.ENABLE_AGENTS
     }
 
 
